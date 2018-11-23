@@ -41,5 +41,6 @@ or
 
 3. Non-persistent Routes
 This command will add routes that are not persistent and will clearout after a reboot.
+route add -net <TargetNetwork> netmask <NetmaskAddress> gw <GatewayAddress> dev <interface>
 route add -net 23.0.0.0 netmask 255.0.0.0 gw 214.38.138.129 dev eth1
 
