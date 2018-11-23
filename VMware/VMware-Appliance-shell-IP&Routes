@@ -44,3 +44,6 @@ This command will add routes that are not persistent and will clearout after a r
 route add -net <TargetNetwork> netmask <NetmaskAddress> gw <GatewayAddress> dev <interface>
 route add -net 23.0.0.0 netmask 255.0.0.0 gw 214.38.138.129 dev eth1
 
+#Sources:
+http://tech.lazyllama.com/2017/04/10/adding-a-static-route-on-vcsa-6-5/
+https://docs.vmware.com/en/vRealize-Automation/7.4/com.vmware.vra.install.upgrade.doc/GUID-6F7851A2-066E-4EBF-BD08-F1AB0025C0A7.html
