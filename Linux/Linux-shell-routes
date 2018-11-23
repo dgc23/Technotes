@@ -1,0 +1,33 @@
+#Non-persistent static route.
+route add -net 192.168.100.0 netmask 255.255.255.0 gw 192.168.10.1 dev eth0
+
+#Persistent static route.
+#File:
+/etc/sysconfig/network-scripts/route-eth0
+ 
+GATEWAY0=192.168.10.1 
+NETMASK0=255.255.255.0 
+ADDRESS0=192.168.100.0
+
+GATEWAY1=10.64.34.1 
+NETMASK1= 255.255.255.240 
+ADDRESS1=10.64.34.10
+
+Save and close the file. Restart networking:
+
+service network restart
+or
+systemctl restart network
+
+#There are various ways to verify the routing table in Linux. Few commands are listed below:
+
+route –n
+
+netstat –nr
+
+ip route show
+
+ 
+
+#Sources:
+https://www.cloudibee.com/static-route-linux/
