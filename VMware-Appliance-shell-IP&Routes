@@ -1,0 +1,45 @@
+#This file contains tasks that can be done on VMware appliance shell.  You should know the basics of the vi text editor.
+
+#Option 1. IP Address configuration
+Interface information if stored in the following location.
+/etc/systemd/network/
+each interface has its own file. eth# states the interface that which the file corresponds.
+/etc/systemd/network/10-eth0.network
+/etc/systemd/network/10-eth1.network
+
+#vi /etc/systemd/network/10-eth0.network
+[Match]
+Name=eth0
+
+[Network]
+Gateway=172.16.32.1 #This line is only on the interface with the default gateway.
+Address=172.16.32.139/24
+DHCP=no
+
+[DHCP]
+UseDNS=false
+
+[Route] #Only add this section to interface that will host the static routes.  Mostly interfaces without default gateway.
+Gateway=192.168.1.20
+Destination=192.168.2.0/24
+
+
+
+2. Routing -- Edit routes file
+file path /etc/sysconfig/network/routes
+edit file vi /etc/sysconfig/netowrk/routes
+
+context
+the default route if in the file should look like this
+default 10.10.10.1 - -
+
+add any new static persitent routes bellow the default using the follow format.
+"Destination Network" "Gateway/Nexthop Address" "Subnetmask of destination network" "interface"
+or
+172.16.32.0 192.168.101.1 255.255.255.0 eth1
+192.168.210.0 192.168.230.1 255.255.255.0 eth2
+
+3. Non-persistent Routes
+This command will add routes that are not persistent and will clearout after a reboot.
+route add -net 23.0.0.0 netmask 255.0.0.0 gw 214.38.138.129 dev eth1
+
