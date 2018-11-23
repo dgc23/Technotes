@@ -1,0 +1,20 @@
+#Remove Orphaned VMs from vCenter
+
+#To connect to your vCenter
+Connect-VIServer -Server YourvCenterServer
+
+#You will be prompted for credentials
+
+#Run the following command to display all VMs.
+Get-VM -Name *
+
+#Add parts of the name to limit displayed VMs
+#For example nam* or *ame
+
+#Once confirmed the name of the VM to delete run the following command.
+Get-VM -Name YourOrphanedVMName | Remove-VM
+
+#Be very carfule to delete only the required VM. Once deleted check that all files related to the VM is also releted.
+
+#Note: The following command will display all VMs plus other info.
+Get-VM | select * | Out-GridView
