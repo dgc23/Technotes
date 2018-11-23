@@ -18,3 +18,7 @@ Get-VM -Name YourOrphanedVMName | Remove-VM
 
 #Note: The following command will display all VMs plus other info.
 Get-VM | select * | Out-GridView
+
+
+#Sources:
+https://victorhomocea.wordpress.com/2016/12/13/how-to-delete-orphaned-vms-on-vmware-vcenter-6-5/
