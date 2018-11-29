@@ -27,7 +27,7 @@ Destination=192.168.2.0/24
 
 2. Routing -- Edit routes file
 file path /etc/sysconfig/network/routes
-edit file vi /etc/sysconfig/netowrk/routes
+edit file vi /etc/sysconfig/network/routes
 
 context
 the default route if in the file should look like this
