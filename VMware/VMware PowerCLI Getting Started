@@ -1,1 +1,9 @@
 ##Online install and offline install
+
+##Install VMware PowerCLI
+Install-Module -Name VMware.PowerCLI -RequiredVersion 10.1.1.8827524 
+
+##Install VMware PowerCLI Offline computer
+Save-Module -Name VMware.PowerCLI -Path C:\Path\To\Destination\Folder
+copy files to external device and copy to offline system
+copy to "C:\Program Files\WindowsPowerShell\Modules"
