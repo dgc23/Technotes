@@ -3,16 +3,17 @@
 ##Install VMware PowerCLI
 Install-Module -Name VMware.PowerCLI -RequiredVersion 10.1.1.8827524 
 
-##Install VMware PowerCLI Offline computer
-Save-Module -Name VMware.PowerCLI -Path C:\Path\To\Destination\Folder
-copy files to external device and copy to offline system
-copy to "C:\Program Files\WindowsPowerShell\Modules"
+##Install VMware PowerCLI Offline computer: Run the following steps.
+1. Save-Module -Name VMware.PowerCLI -Path C:\Path\To\Destination\Folder
+2. Copy files to external device and copy to offline system
+3. Copy to "C:\Program Files\WindowsPowerShell\Modules"
 
+##Scripts: To run scripts you will need to use the following commands to set the execution policy.
 Get-ExecutionPolicy
-Set-ExecutionPolicy
+Set-ExecutionPolicy 
 
 Get-Module -Name PowerShellGet -ListAvailable
 
-##To check and set SSL configuration run the following commands.
+##To check and set SSL configuration run the following commands.  This will be needed to allow you to connect to systems with selfsigned certificates.
 Get-PowerCLIConfiguration
 Set-PowerCLIConfiguration -InvalidCertificateAction Ingore
