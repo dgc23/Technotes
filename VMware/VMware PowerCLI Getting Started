@@ -17,3 +17,21 @@ Get-Module -Name PowerShellGet -ListAvailable
 ##To check and set SSL configuration run the following commands.  This will be needed to allow you to connect to systems with selfsigned certificates.
 Get-PowerCLIConfiguration
 Set-PowerCLIConfiguration -InvalidCertificateAction Ingore
+
+##Once powershell is up and running you will need to run the followoing command to connect 
+
+##Log in to a vCenter Server or ESX host:
+Connect-VIServer
+
+##To find out what commands are available, type: 
+Get-VICommand
+
+##To show searchable help for all PowerCLI commands:
+Get-PowerCLIHelp
+
+##Once you've connected, display all virtual machines:
+Get-VM
+
+##If you need more help, visit the PowerCLI community:
+Get-PowerCLICommunity
+
