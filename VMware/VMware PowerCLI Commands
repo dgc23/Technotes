@@ -1,0 +1,13 @@
+Get-Datastore | Where {$_.RemoteHost -like '*8.8*'} |Get-Vm
+
+get-datastore 'SKY-MGMT-old' | get-vm
+
+get-datastore 'SKY-MGMT-1400' | Get-Template
+
+Get-Datastore | Where {$_.Name -notlike '*ISO*'} | Where {$_.RemoteHost -like '*8.8*'}  |get-vm
+
+Get-Datastore | Where {$_.Name -like '*ISO*'} | Where {$_.RemoteHost -like '*8.8*'} | Get-VM | Out-GridView
+
+Get-Datastore | Where {$_.Name -like '*ISO*'} |Get-Vm |Select *| Out-GridView
+
+Get-Datastore |select Name, FileSystemVersion,CapacityGB , RemoteHost, RemotePath| Out-GridView
