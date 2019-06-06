@@ -1,0 +1,11 @@
+#Source: https://nutzandbolts.wordpress.com/2013/02/25/get-hba-wwn-for-hosts-using-powercli/
+#See source for URL for more info and more detailed script.
+
+
+#Get WWN for cluster 
+Get-Cluster clustername | Get-VMhost | Get-VMHostHBA -Type FibreChannel | Select VMHost,Device,@{N="WWN";E={"{0:X}" -f $_.PortWorldWideName}} | Sort VMhost,Device
+
+#Get WWN by single host 
+Get-VMhost -Name Host | Get-VMHostHBA-Type FibreChannel | Select VMHost,Device,@{N="WWN";E={"{0:X}" -f $_.PortWorldWideName}} | Sort VMhost,Device
+
+
