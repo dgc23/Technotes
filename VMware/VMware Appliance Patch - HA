@@ -1,0 +1,21 @@
+//Update VMware Appliance in HA
+
+1. Place vCenter cluster in Maintenance Mode
+	a. Click on vCenter >> Configure >> Edit and then set in Mainteance Mode
+
+2. Take snapshot of all nodes in vCenter Cluster
+
+3. Mount iso for update to the appliance to be updated.
+	a. first update 'Witness' then 'Passive' and finaly failover and patch the former 'Active' node.
+
+4.  open the console to the appliance
+	a. run the following command 'software-packages install --iso --acceptEulas'
+	b. reboot the appliance running the next command 'shutdown reboot -r "reboot notes"'
+
+
+
+
+
+
+Sources:
+https://www.settlersoman.com/how-to-update-or-patch-vcenter-6-appliance-vcsa/
