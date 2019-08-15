@@ -22,3 +22,10 @@ Get-VM | select * | Out-GridView
 
 #Sources:
 https://victorhomocea.wordpress.com/2016/12/13/how-to-delete-orphaned-vms-on-vmware-vcenter-6-5/
+
+
+
+#----------------------------------#
+#Reload Invalid or Inaccessible VMs.  before running this command insure the host and storage are up and running.
+
+(Get-View -ViewType VirtualMachine) |?{$_.Runtime.ConnectionState -eq "invalid" -or $_.Runtime.ConnectionState -eq "inaccessible"} |%{$_.reload()}
