@@ -27,5 +27,7 @@ https://victorhomocea.wordpress.com/2016/12/13/how-to-delete-orphaned-vms-on-vmw
 
 #----------------------------------#
 #Reload Invalid or Inaccessible VMs.  before running this command insure the host and storage are up and running.
+#With this command you will not need to remove and readd the vm in the inventory.
 
 (Get-View -ViewType VirtualMachine) |?{$_.Runtime.ConnectionState -eq "invalid" -or $_.Runtime.ConnectionState -eq "inaccessible"} |%{$_.reload()}
+###Gets a list of VM | filters where connection state is "invalid" or "inaccessible" |  reloads the config of the VMs
