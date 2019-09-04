@@ -11,3 +11,6 @@ Get-Datastore | Where {$_.Name -like '*ISO*'} | Where {$_.RemoteHost -like '*8.8
 Get-Datastore | Where {$_.Name -like '*ISO*'} |Get-Vm |Select *| Out-GridView
 
 Get-Datastore |select Name, FileSystemVersion,CapacityGB , RemoteHost, RemotePath| Out-GridView
+
+//Get HBA infor from each host in a cluster.
+Get-Cluster 'Cluster Name' | Get-VMhost | Get-VMHostHBA -Type FibreChannel | Select VMHost,Device,@{N="WWN";E={"{0:X}" -f $_.PortWorldWideName}} | Sort VMhost,Device |Out-GridView
