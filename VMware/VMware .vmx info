@@ -3,3 +3,4 @@ Info
 enable nested virtulization
 enable == Virtual Hardware-Assisted Virtualization
 vhv.enable="true"
+https://www.virtuallyghetto.com/2012/08/how-to-enable-nested-esxi-other.html 
