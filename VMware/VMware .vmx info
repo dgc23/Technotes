@@ -1,4 +1,5 @@
 Info
 
 enable nested virtulization
+enable == Virtual Hardware-Assisted Virtualization
 vhv.enable="true"
