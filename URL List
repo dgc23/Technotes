@@ -9,3 +9,6 @@ https://www.almostaninja.com/adding-vmkernel-ports-to-multiple-hosts-using-power
 
 Get VMware Tools
 https://blog.jgriffiths.org/powercli-how-to-get-vmware-tools-version/
+
+Get-hba-firmware
+http://www.vcloudnotes.com/2019/12/powercli-script-to-get-hba-firmware-and.html
