@@ -1,12 +1,16 @@
-Get-Datastore | Where {$_.RemoteHost -like '*8.8*'} |Get-Vm
+//Display VMs on a given datastore connect to an ip containing 192.168.
+Get-Datastore | Where {$_.RemoteHost -like '*192.168*'} |Get-Vm
 
+//Display VMs on a given datastore.
 get-datastore 'Datastore Name' | get-vm
 
+//Display Templates on a given datastore.
 get-datastore 'Datastore Name' | Get-Template
 
-Get-Datastore | Where {$_.Name -notlike '*ISO*'} | Where {$_.RemoteHost -like '*8.8*'}  |get-vm
 
-Get-Datastore | Where {$_.Name -like '*ISO*'} | Where {$_.RemoteHost -like '*8.8*'} | Get-VM | Out-GridView
+Get-Datastore | Where {$_.Name -notlike '*ISO*'} | Where {$_.RemoteHost -like '*2.16*'}  |get-vm
+
+Get-Datastore | Where {$_.Name -like '*ISO*'} | Where {$_.RemoteHost -like '*2.168*'} | Get-VM | Out-GridView
 
 Get-Datastore | Where {$_.Name -like '*ISO*'} |Get-Vm |Select *| Out-GridView
 
