@@ -1,8 +1,8 @@
 Get-Datastore | Where {$_.RemoteHost -like '*8.8*'} |Get-Vm
 
-get-datastore 'SKY-MGMT-old' | get-vm
+get-datastore 'Datastore Name' | get-vm
 
-get-datastore 'SKY-MGMT-1400' | Get-Template
+get-datastore 'Datastore Name' | Get-Template
 
 Get-Datastore | Where {$_.Name -notlike '*ISO*'} | Where {$_.RemoteHost -like '*8.8*'}  |get-vm
 
@@ -14,3 +14,7 @@ Get-Datastore |select Name, FileSystemVersion,CapacityGB , RemoteHost, RemotePat
 
 //Get HBA infor from each host in a cluster.
 Get-Cluster 'Cluster Name' | Get-VMhost | Get-VMHostHBA -Type FibreChannel | Select VMHost,Device,@{N="WWN";E={"{0:X}" -f $_.PortWorldWideName}} | Sort VMhost,Device |Out-GridView
+
+
+//Get Host UpTime in Days. This by Cluster.
+ Get-Cluster "Cluster Name" |Get-VMHost |select Name, @{N="UPTime"; E={New-TimeSpan -Start $_.ExtensionData.Summary.Runtime.BootTime -End (Get-Date) |select -ExpandProperty Days}}
