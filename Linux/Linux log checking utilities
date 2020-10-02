@@ -1,0 +1,12 @@
+#to show the last 10 lines and any new lines in vmkernal.log file
+tail -f /var/log/vmkernel.log
+
+#to show the contents of the log file with ability to move forward and back on the file
+less /var/log/vmkernel.log
+
+#to show status of system
+top
+
+#on vmware host ues
+esxtop
+#press u to show datastore status like davg and kavg
