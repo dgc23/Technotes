@@ -26,3 +26,7 @@ Get-Cluster 'Cluster Name' | Get-VMhost | Get-VMHostHBA -Type FibreChannel | Sel
 //Start and Stop SSH service on Host
 Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | Start-VMHostService
 Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | Stop-VMHostService
+
+
+Place Host in Mantance Mode
+Get-MVHost "host name" |set-VMHost -State Maintence
