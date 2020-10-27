@@ -7,13 +7,10 @@ get-datastore 'Datastore Name' | get-vm
 //Display Templates on a given datastore.
 get-datastore 'Datastore Name' | Get-Template
 
-
+//Get VMs on datastore
 Get-Datastore | Where {$_.Name -notlike '*ISO*'} | Where {$_.RemoteHost -like '*2.16*'}  |get-vm
-
 Get-Datastore | Where {$_.Name -like '*ISO*'} | Where {$_.RemoteHost -like '*2.168*'} | Get-VM | Out-GridView
-
 Get-Datastore | Where {$_.Name -like '*ISO*'} |Get-Vm |Select *| Out-GridView
-
 Get-Datastore |select Name, FileSystemVersion,CapacityGB , RemoteHost, RemotePath| Out-GridView
 
 //Get HBA infor from each host in a cluster.
@@ -30,3 +27,10 @@ Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | Stop-VMHostService
 
 //Place Host in Mantance Mode
 Get-MVHost "host name" |set-VMHost -State Maintence
+
+//Unmount VM Tools
+get-vm |where {$_.ExtensionData.Runtime.ToolsInstallerMounted -eq $true} |Dismount-Tools
+
+//Unmount CD Drive
+Get-VM | Get-CDDrive| where{$_.IsoPath -match "vmware/isoimages"} |Set-CDDrive -NoMedia -Confirm:$false
+//"-match can be replace with -like or -eq or ..."
