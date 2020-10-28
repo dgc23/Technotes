@@ -34,3 +34,10 @@ get-vm |where {$_.ExtensionData.Runtime.ToolsInstallerMounted -eq $true} |Dismou
 //Unmount CD Drive
 Get-VM | Get-CDDrive| where{$_.IsoPath -match "vmware/isoimages"} |Set-CDDrive -NoMedia -Confirm:$false
 //"-match can be replace with -like or -eq or ..."
+
+//List Hosts with vswitch0 and vmk# with 1500
+Get-VMHost | Get-VirtualSwitch -Name vSwitch0 |where  MTU -eq "1500"|select @{N="HostName";E={$_.VMHost.Name}},MTU |Out-GridView
+Get-VMHost | Get-VMHostNetworkAdapter |where MTU -eq 1500|select @{N="HostName";E={$_.VMHost.Name}},Name,MTU|Out-GridView
+//List Host with vSwitch0 and vmk# and set mtu to 9000
+Get-VMHost | Get-VirtualSwitch -Name vSwitch0 |where  MTU -eq "1500"|Set-VirtualSwitch -MTU 9000
+Get-VMHost | Get-VMHostNetworkAdapter |where MTU -eq 1500|select @{N="HostName";E={$_.VMHost.Name}},Name,MTU|Set-VMHostNetworkAdapter -MTU 9000
