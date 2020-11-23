@@ -41,3 +41,6 @@ Get-VMHost | Get-VMHostNetworkAdapter |where MTU -eq 1500|select @{N="HostName";
 //List Host with vSwitch0 and vmk# and set mtu to 9000
 Get-VMHost | Get-VirtualSwitch -Name vSwitch0 |where  MTU -eq "1500"|Set-VirtualSwitch -MTU 9000
 Get-VMHost | Get-VMHostNetworkAdapter |where MTU -eq 1500|select @{N="HostName";E={$_.VMHost.Name}},Name,MTU|Set-VMHostNetworkAdapter -MTU 9000
+
+//Reset MGMT agent on all host in cluster.
+get-cluster "Cluster Name" |Get-VMHost | Get-VMHostService |where {$_.Key -eq "vpxa"} |Restart-VMHostService -Confirm:$false
