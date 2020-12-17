@@ -1,4 +1,6 @@
 //Update VMware Appliance in HA
+//download patch from following location. https://my.vmware.com/group/vmware/patch#search
+
 
 1. Place vCenter cluster in Maintenance Mode
 	a. Click on vCenter >> Configure >> Edit and then set in Mainteance Mode
