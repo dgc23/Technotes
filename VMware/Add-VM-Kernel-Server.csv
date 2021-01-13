@@ -1,3 +1,2 @@
-HostIP,vSwitch1,vSwitch2,iscsia,iscsib,iscsiIP1,iscsiIP2,iscsisubnet,vmotiona,vmotionb,vmotionIP1,vmotionIP2,vmosubnet,iscsinic1,iscsinic2,vmonic1,vmonic2
-10.1.1.50,vSwitch1,vSwitch2,iSCSI1,iSCSI2,10.0.9.30,10.0.9.31,255.255.255.0,vMotion1,vMotion2,172.16.0.30,172.16.0.31,255.255.255.0,vmnic2,vmnic3,vmnic4,vmnic5
-10.1.1.51,vSwitch1,vSwitch2,iSCSI1,iSCSI2,10.0.9.40,10.0.9.41,255.255.255.0,vMotion1,vMotion2,172.16.0.40,172.16.0.41,255.255.255.0,vmnic2,vmnic3,vmnic4,vmnic5
+HostDNS,HostIP_M,VLAN_M,Snet_M,HostIP_NFS,VLAN_NFS,Snet_NFS
+Host.Name.com,
