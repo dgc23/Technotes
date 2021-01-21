@@ -21,9 +21,9 @@ Get-Cluster 'Cluster Name' | Get-VMhost | Get-VMHostHBA -Type FibreChannel | Sel
  Get-Cluster "Cluster Name" |Get-VMHost |select Name, @{N="UPTime"; E={New-TimeSpan -Start $_.ExtensionData.Summary.Runtime.BootTime -End (Get-Date) |select -ExpandProperty Days}}
 
 //Start and Stop SSH service on Host
-Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | where Running -eq False |Start-VMHostService
-Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | where Running -eq True |Stop-VMHostService
-Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | where Running -eq True|select VMhost, Label, Running
+Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | where Running -EQ $false |Start-VMHostService
+Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | where Running -EQ $true |Stop-VMHostService
+Get-VMHost | Get-VMHostService | Where Key -EQ "TSM-SSH" | where Running -EQ $true |select VMhost, Label, Running
 
 //Place Host in Mantance Mode
 Get-MVHost "host name" |set-VMHost -State Maintence
