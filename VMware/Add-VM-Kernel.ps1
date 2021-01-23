@@ -23,7 +23,7 @@ Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 | Set-VirtualSwitch -Mtu 9000 
 #Create vMotion vmkernal
 if ((Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion -ErrorAction SilentlyContinue) -eq $null) {
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch "vSwitch0" -PortGroup vMotion -IP $vMot_IP -SubnetMask $vMot_Mask -Mtu 9000 -VMotionEnabled:$true
-Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion |Set-VirtualPortGroup -VLanId 1100
+Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion |Set-VirtualPortGroup -VLanId $vMot_VLAN
 Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
 }else {
 Write-Host "vMotion VMK already exist"
@@ -41,7 +41,6 @@ Write-Host "NFS VMK already exist"
 
 #Create Backup Portgroup on DVS - checking condition not working
 if ((Get-VirtualPortGroup -VMHost $HostDNS -Name 'Cloud_infrastructure|CohesityBackupAP|BackupEPG' -ErrorAction SilentlyContinue) -eq $null) {
-#New-VMHostNetworkAdapter -VMHost $HostDNS -PortGroup 'Cloud_infrastructure|CohesityBackupAP|BackupEPG' 
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch $DVS -PortGroup $Bkup_PortGroup -IP $Bkup_IP -SubnetMask $Bkup_Mask
 
 }else {
