@@ -1,4 +1,15 @@
-$Servers = Import-Csv "C:\Software\Script\Servers1.csv"
+##This script will configure vmkernel port on all host in source file.
+#It will Check and if needed make changes listed bellow
+    #1. Set vSwitch0 MTU to 9000
+    #2 Create and configure vMotion vmk
+    #3 Create and configure NFS vmk
+    #4 Create and configure Backup vmk
+    #5 Configure vmk0 MTU to 9000
+#
+#This script requires a source file located in the same as the script.
+#
+
+$Servers = Import-Csv ".\Servers.csv"
 
 foreach ($Server in $Servers) {
     $HostDNS = $Server.HostDNS
@@ -12,13 +23,17 @@ foreach ($Server in $Servers) {
     $Bkup_Mask = $Server.Bkup_Mask
     $Bkup_PortGroup = $Server.Bkup_PortGroup
     $DVS = $Server.DVS
-
-    #$MTU_M = $Server.MTU_M
+   
 
 Write-Host "----------------------------------------------------------"
 Write-Host "Starting the configuration of host"$HostDNS
 #Configure vSwtich0 MTU to 9000
+if  ((Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 |where {$_.MTU  -eq 9000}) -eq $null){
+Write-Host "Serring vSwitch MTU equal to 9000 on"$HostDNS
 Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 | Set-VirtualSwitch -Mtu 9000 -Confirm:$false
+}else{
+Write-Host "vSwitch0 MTU already set to 9000 on"$HostDNS
+}
 #
 
 #Create vMotion vmkernal
@@ -51,7 +66,11 @@ New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch $DVS -PortGroup $Bkup_P
 Write-Host "Backup VMK already exist on"$HostDNS
 }
 
-#Set vmk0 MTU to 9000 -Place at End
-#Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -Mtu 9000 -Confirm:$false -ErrorAction SilentlyContinue
-
+#Set vmk0 MTU to 9000 -Place at End as it will intrupt comunnication with host for up to 1 min.
+if ((Get-VMHostNetworkAdapter -vmhost $HostDNS -Name vmk0| where {$_.MTU -eq 9000}) -eq $null){
+Write-Host "Setting MTU of vmk0 on host"$HostDNS "to 9000"
+Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -Mtu 9000 -Confirm:$false -ErrorAction SilentlyContinue
+}else{
+Write-Host "MTU on vmk0 already set to 9000 on host"$HostDNS
+}
 }
