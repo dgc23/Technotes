@@ -3,13 +3,14 @@
     #1. Set vSwitch0 MTU to 9000
     #2 Create and configure vMotion vmk
     #3 Create and configure NFS vmk
-    #4 Create and configure Backup vmk
-    #5 Configure vmk0 MTU to 9000
+    #4 Configure DVS on Host
+    #5 Create and configure Backup vmk
+    #6 Configure vmk0 MTU to 9000
 #
 #This script requires a source file located in the same as the script.
 #
 
-$Servers = Import-Csv ".\Servers.csv"
+$Servers = Import-Csv ".\Servers1.csv"
 
 foreach ($Server in $Servers) {
     $HostDNS = $Server.HostDNS
@@ -58,11 +59,27 @@ Write-Host "NFS VMK already exist on"$HostDNS
 }
 #
 
+#Check and Configure DVS on Host
+if((Get-VMHost $HostDNS | Get-VDSwitch) -eq $null){
+Write-Host "Adding DVS to Host "$HostDNS
+$vmhostNetworkAdapter1 = $null
+$vmhostNetworkAdapter2 = $null
+Add-VDSwitchVMHost -VDSwitch $DVS -VMHost $HostDNS
+$vmhostNetworkAdapter1 = Get-VMHost $HostDNS | Get-VMHostNetworkAdapter -Physical -Name vmnic2
+Get-VDSwitch $DVS | Add-VDSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $vmhostNetworkAdapter1 -Confirm:$false
+$vmhostNetworkAdapter2 = Get-VMHost $HostDNS | Get-VMHostNetworkAdapter -Physical -Name vmnic3
+Get-VDSwitch $DVS | Add-VDSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $vmhostNetworkAdapter2 -Confirm:$false
+}else{
+Write-Host "A DVS is already configured"
+}
+
 #Create Backup Portgroup on DVS - checking condition not working
-if ((Get-VDPortGroup -Name $Bkup_PortGroup | Get-VMHostNetworkAdapter |where {$_.VMHost -like $HostDNS} -ErrorAction SilentlyContinue) -eq $null) {
+if (((Get-VDPortGroup -Name $Bkup_PortGroup | Get-VMHostNetworkAdapter |where {$_.VMHost -like $HostDNS} -ErrorAction SilentlyContinue) -eq $null)) {
 Write-Host "Creating Backup VMKernal Port on"$HostDNS
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch $DVS -PortGroup $Bkup_PortGroup -IP $Bkup_IP -SubnetMask $Bkup_Mask
-}else {
+}elseif ($BKup_PortGroup -eq $null){
+Write-Host "***No Backup VMKernel Specified for "$HostDNS
+}else{
 Write-Host "Backup VMK already exist on"$HostDNS
 }
 
@@ -73,4 +90,6 @@ Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapt
 }else{
 Write-Host "MTU on vmk0 already set to 9000 on host"$HostDNS
 }
+
+
 }
