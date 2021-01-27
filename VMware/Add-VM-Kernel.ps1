@@ -28,6 +28,7 @@ foreach ($Server in $Servers) {
 
 Write-Host "----------------------------------------------------------"
 Write-Host "Starting the configuration of host"$HostDNS
+
 #Configure vSwtich0 MTU to 9000
 if  ((Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 |where {$_.MTU  -eq 9000}) -eq $null){
 Write-Host "Serring vSwitch MTU equal to 9000 on"$HostDNS
@@ -47,7 +48,6 @@ Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapt
 Write-Host "vMotion VMK already exist on"$HostDNS
 }
 ###
-
 
 #Create NFS vmkernal
 if ((Get-VirtualPortGroup -VMHost $HostDNS -Name NFS -ErrorAction SilentlyContinue) -eq $null) {
@@ -73,15 +73,23 @@ Get-VDSwitch $DVS | Add-VDSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $vmhos
 Write-Host "A DVS is already configured"
 }
 
-#Create Backup Portgroup on DVS - checking condition not working
-if (((Get-VDPortGroup -Name $Bkup_PortGroup | Get-VMHostNetworkAdapter |where {$_.VMHost -like $HostDNS} -ErrorAction SilentlyContinue) -eq $null)) {
+#Create Backup Portgroup on DVS
+if (!$Bkup_PortGroup){
+Write-Host "****No backup DVS port group supplied for host"$HostDNS
+}elseif (((Get-VDPortGroup -Name $Bkup_PortGroup | Get-VMHostNetworkAdapter |where {$_.VMHost -like $HostDNS} -ErrorAction SilentlyContinue) -eq $null)) {
 Write-Host "Creating Backup VMKernal Port on"$HostDNS
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch $DVS -PortGroup $Bkup_PortGroup -IP $Bkup_IP -SubnetMask $Bkup_Mask
-}elseif ($BKup_PortGroup -eq $null){
-Write-Host "***No Backup VMKernel Specified for "$HostDNS
 }else{
 Write-Host "Backup VMK already exist on"$HostDNS
 }
+
+
+#Set vMotion status on each vmk port
+Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
+Get-VMHost $HostDNS |Get-VMHostNetworkAdapter |where {$_.PortGroupName -eq 'NFS'} |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
+Get-VMHost $HostDNS |Get-VMHostNetworkAdapter |where {$_.PortGroupName -eq $Bkup_PortGroup} |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
+Get-VMHost $HostDNS |Get-VMHostNetworkAdapter |where {$_.PortGroupName -eq 'vMotion'} |Set-VMHostNetworkAdapter -VMotionEnabled:$true -Confirm:$false
+
 
 #Set vmk0 MTU to 9000 -Place at End as it will intrupt comunnication with host for up to 1 min.
 if ((Get-VMHostNetworkAdapter -vmhost $HostDNS -Name vmk0| where {$_.MTU -eq 9000}) -eq $null){
