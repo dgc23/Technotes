@@ -10,7 +10,7 @@
 #This script requires a source file located in the same as the script.
 #
 
-$Servers = Import-Csv ".\Servers1.csv"
+$Servers = Import-Csv ".\Servers.csv"
 
 foreach ($Server in $Servers) {
     $HostDNS = $Server.HostDNS
@@ -31,7 +31,7 @@ Write-Host "Starting the configuration of host"$HostDNS
 
 #Configure vSwtich0 MTU to 9000
 if  ((Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 |where {$_.MTU  -eq 9000}) -eq $null){
-Write-Host "Serring vSwitch MTU equal to 9000 on"$HostDNS
+Write-Host "Setting vSwitch MTU equal to 9000 on"$HostDNS
 Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 | Set-VirtualSwitch -Mtu 9000 -Confirm:$false
 }else{
 Write-Host "vSwitch0 MTU already set to 9000 on"$HostDNS
@@ -84,7 +84,7 @@ Write-Host "Backup VMK already exist on"$HostDNS
 }
 
 
-#Set vMotion status on each vmk port
+#Set vMotion
 Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
 Get-VMHost $HostDNS |Get-VMHostNetworkAdapter |where {$_.PortGroupName -eq 'NFS'} |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
 Get-VMHost $HostDNS |Get-VMHostNetworkAdapter |where {$_.PortGroupName -eq $Bkup_PortGroup} |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
