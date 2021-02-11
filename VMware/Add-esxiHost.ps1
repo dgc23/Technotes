@@ -8,7 +8,7 @@ $vCenter="vcsa.local"
 #$vCenterUser="rboadi@lab.local"
 #$vCenterUserPassword="xxxxxx"
 
-$vcenterlocation="~Spare M5" #Cluster Name
+$vcenterlocation="~Spare Hosts" #Cluster Name
 
 #
 
