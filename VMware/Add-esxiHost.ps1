@@ -3,7 +3,7 @@
 
 
 
-$vCenter="sky-vcsa.cef.doj.gov"
+$vCenter="vcsa.local"
 
 #$vCenterUser="rboadi@lab.local"
 #$vCenterUserPassword="xxxxxx"
