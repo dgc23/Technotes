@@ -1,17 +1,18 @@
 # Source **https://virtuallythatguy.co.uk/how-to-add-esxi-hosts-to-vcenter-using-powercli-automation/
 # Specify vCenter Server, vCenter Server username, vCenter Server user password, vCenter Server location which can be the Datacenter, a Folder or a Cluster (which I used).
-
+Import-Module -Name VMware.VimAutomation.Cis.Core
 #
-$vCenter="vcsa.local"
+$vCenterURL = 'vCenter.localv'
 #$vCenterUser="rboadi@lab.local"
 #$vCenterUserPassword="xxxxxx" #Do not store password in scripts.
-$vcenterlocation="~Spare Hosts" #Target Cluster Name
-$esxihostuser="root"
+$vcenterlocation = "~Spare Hosts" #Target Cluster Name
+$esxihostuser = "root"
 #$esxihostpasswd="xxxxxxx"
 #
 #Connect to vCenter Server
-Write-Host "Connecting​​ to​​ vCenter​​ Server​"​ $vcenter​​ -foreground​​ green
-Connect-viserver​​ $vCenter​​ | out-null #-user $vCenterUser -password $vCenterUserPassword -WarningAction 0 | out-null
+Write-Host "Connecting to vCenter Server" $vCenterURL -ForegroundColor Green
+Connect-VIServer -Server $vCenterURL |Out-Null
+
 #
 #
 
@@ -61,44 +62,34 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK)
     #$clustername
 }
 
-
-$vCenter="vcsa.local"
-#$vCenterUser="rboadi@lab.local"
-#$vCenterUserPassword="xxxxxx"
-$vcenterlocation="~Spare Hosts" #Target Cluster Name
-$esxihostuser="root"
-#$esxihostpasswd="xxxxxxx"
-#
-# Specify the ESXi host you want to add to vCenter Server and the user name and password to be used.
+#Specify the ESXi host you want to add to vCenter Server and the user name and password to be used.
 #$esxihosts=("DTCP-ESXi01.lab.local","DTCP-ESXi02.lab.local","DTCP-ESXi03.lab.local")​​ #(Get-VMHost -Name "UK3P-*")
 $Servers = Import-Csv ".\Servers.csv"
 
 foreach ($Server in $Servers) {
     $HostDNS = $Server.HostDNS
-
-
 #
 # The variables specified above will be used to add hosts to vCenter
 # ------------------------------------------------------------------
 Write-Host '--------'
-write-host "Starting to​​ add​​ ESXi​​ hosts​​ to​​ the​​ vCenter​​ Server"​​ $vCenter
+write-host "Starting to add" $HostDNS "to the vCenter Server" $vCenter
 write-host '--------'
 #
 # Add ESXi hosts
 #
-
 if ((Get-VMHost -Name $HostDNS) -eq $null){
-
-Add-VMHost​​ $esxihost​​ -Location​​ $vcenterlocation​​ -User​​ $esxihostuser​​ -Password​​ $esxihostpasswd​​ -Force
+Write-Host "Adding" $HostDNS "to vCenter" $vCenter
+#Add-VMHost $esxihost -Location $vcenterlocation -User $esxihostuser -Password $esxihostpasswd -Force
 }else{
 Write-Host $HostDNS "is already in vCenter"
 }
 }
-
 #
 # Disconnect from vCenter Server
 $esxihostpasswd = $null
-Write-Host "Disconnecting to vCenter Server​​ $vcenter"​​ -foreground​​ green
-disconnect-viserver​​ *​​ -confirm:$false​​ |​​ out-null
 
-#You can change​​ the​​ $esxihosts​​ to​​ a wildcard and save you some typing replace with something​​ like​​ #(Get-VMHost -Name "DTCP-*").​​
+
+Write-Host "Disconnecting from vCenter Server"$vCenterURL -ForegroundColor Green
+Disconnect-VIServer -Server $vCenterURL -Confirm:$false |Out-Null
+
+#You can change the $esxihosts to a wildcard and save you some typing replace with something like #(Get-VMHost -Name "DTCP-*").
