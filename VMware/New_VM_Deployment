@@ -1,3 +1,5 @@
+# https://blogs.vmware.com/PowerCLI/2014/06/working-customization-specifications-powercli-part-3.html
+# https://www.vmware.com/support/developer/PowerCLI/PowerCLI41U1/html/New-VM.html
 
 
 $New_VM = Import-Csv ".\New_VMlist.csv"
@@ -10,5 +12,9 @@ foreach ($New_VM in $New_VMs) {
     $Template = $New_VM.Template
     $Cust_Name = $New_VM.Cust_Name
 
+New-VM -Name $VM_Name -
+
+New-VM –Name $VM_Name –ResourcePool $cluster –Template $template
 
    }
+   
