@@ -1,0 +1,14 @@
+
+
+$New_VM = Import-Csv ".\New_VMlist.csv"
+
+foreach ($New_VM in $New_VMs) {
+    $VM_Name = $New_VM.VN_Name
+    $Cluster = $New_VM.Cluster
+    $IP_Address = $New_VM.IP_Address
+    $Subnet_Mask = $New_VM.Subnet_Mask
+    $Template = $New_VM.Template
+    $Cust_Name = $New_VM.Cust_Name
+
+
+   }
