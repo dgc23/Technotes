@@ -1,1 +1,1 @@
-VM_Name,Cluster,IP_Address,Subnet_Mask,Template,Cust_Name,Folder_Name
+VM_Name,Cluster,Template_Name,Cust_Name,Folder_Name,Datastore
