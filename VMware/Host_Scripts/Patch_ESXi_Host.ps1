@@ -4,7 +4,13 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
+#vCenter Config - Optional
+Write-Host "Please Provide vCenter Name"
+$v = Read-Host
+Connect-VIServer -Server $v -InformationAction SilentlyContinue -WarningAction SilentlyContinue
+
 $vmCluster = get-cluster
+
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Select a Cluster Name'
 $form.Size = New-Object System.Drawing.Size(300,200)
@@ -34,14 +40,8 @@ $listBox.Location = New-Object System.Drawing.Point(10,40)
 $listBox.Size = New-Object System.Drawing.Size(260,20)
 $listBox.Height = 80
 
-[void] $listBox.Name = $vmCluster
-#[void] $listBox.Items.Add('atl-dc-001')
-#[void] $listBox.Items.Add('atl-dc-002')
-#[void] $listBox.Items.Add('atl-dc-003')
-#[void] $listBox.Items.Add('atl-dc-004')
-#[void] $listBox.Items.Add('atl-dc-005')
-#[void] $listBox.Items.Add('atl-dc-006')
-#[void] $listBox.Items.Add('atl-dc-007')
+
+$listBox.Items.AddRange($vmCluster.Name)
 
 $form.Controls.Add($listBox)
 
@@ -51,38 +51,14 @@ $result = $form.ShowDialog()
 
 if ($result -eq [System.Windows.Forms.DialogResult]::OK)
 {
-    $x = $listBox.SelectedItem
-    $x
+    $c = $listBox.SelectedItem
+    $c
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #Not needed if dropdown menu works.
 #Write-Host "Please Provide cluster name"
 #$c = Read-Host
-#$i = Get-Cluster -Name $c |Get-VMHost
+$i = Get-Cluster -Name $c |Get-VMHost
 
 
 Get-Cluster -Name $c |get-vm |where {$_.ExtensionData.Runtime.ToolsInstallerMounted -eq $true} |Dismount-Tools
@@ -90,34 +66,43 @@ Get-Cluster -Name $c |get-vm |where {$_.ExtensionData.Runtime.ToolsInstallerMoun
 
 foreach ($j in $i){
 
+if (((Get-VMHost -Name $j.Name).ConnectionState -eq 'Connected') -or ((Get-VMHost -Name $j.Name).ConnectionState -eq 'Maintenance')){
+
 if ((Get-Compliance -Entity $j.name -ComplianceStatus NotCompliant).Baseline.Name -eq $null){
-Write-Host "No patchse needed for" $j -ForegroundColor Cyan
+Write-Host "No patchse needed for" $j.Name -ForegroundColor Cyan
 }else{
 Write-Host "Starting to patch"$j.Name -ForegroundColor Green
 
 #Checking current host connection status.
-$vmh = Get-VMHost -Name $j.Name |select ConnectionState
+$vmh = Get-VMHost -Name $j.Name -InformationAction SilentlyContinue -WarningAction SilentlyContinue
 Write-Host "Current Host State:" $j.ConnectionState
 
 #Place Host into Maintence Mode if needed.
-if ((Get-VMHost -Name $j.Name |select ConnectionState) -eq 'Connected'){
-Write-Host "Placing Host" $ESXiHost "into Maintence Mode." -ForegroundColor Green
-Get-VMHost -Name $j.Name |Set-VMHost -State Maintenance
+if ((Get-VMHost -Name $j.Name).ConnectionState -eq 'Connected'){
+Write-Host "Placing Host" $j.Name "into Maintence Mode." -ForegroundColor Green
+Get-VMHost -Name $j.Name |Set-VMHost -State Maintenance -InformationAction SilentlyContinue -WarningAction SilentlyContinue
 }
 
-if((Get-VMHost -Name $j.Name |select ConnectionState) -ne 'Maintenance'){
 #Deploy Patches to the host.
-Write-Host "Deploying Patches to host" $j "."
+if((Get-VMHost -Name $j.Name).ConnectionState -eq "Maintenance"){
+Write-Host "Deploying Patches to host" $j.Name "." -ForegroundColor Green
 $B = Get-Compliance -Entity $j.Name -ComplianceStatus NotCompliant
 Remediate-Inventory -Entity $j.Name -Baseline $B.Baseline -ClusterDisableHighAvailability:$true -ErrorAction SilentlyContinue -Confirm: $false
 }else{
-Write-Host "Could not Remediate Host:" $j.Name "Current Connection State:" $j.ConnectionState
+Write-Host "Could not Remediate Host:" $j.Name "Current Connection State:" $j.ConnectionState -ForegroundColor Red
 }
 
-#Return host to other mode.
+#Set connection state to Connected.
 if ($vmh.ConnectionState -eq 'Connected'){
-Write-Host "Removing host " $j "from Maintence Mode."
+Write-Host "Removing host " $j.Name "from Maintence Mode." -ForegroundColor Green
 Get-VMHost -Name $j.Name |Set-VMHost -State $vmh.ConnectionState
 }
+}
+}else{
+Write-Host "Could not Patch" $j.Name "current connection state:" $j.ConnectionState -ForegroundColor Red
+}
 
-}}
+}
+
+#Disconnect-VIServer -Server $v -Confirm:$false -InformationAction SilentlyContinue
+Pause
