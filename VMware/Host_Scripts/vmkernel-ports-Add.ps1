@@ -26,7 +26,7 @@ foreach ($Server in $Servers) {
     $DVS = $Server.DVS
    
 
-Write-Host "----------------------------------------------------------"
+Write-Host "----------------------------------------------------------" -ForegroundColor Cyan -BackgroundColor Blue
 Write-Host "Starting the configuration of host"$HostDNS
 
 #Configure vSwtich0 MTU to 9000
@@ -38,18 +38,26 @@ Write-Host "vSwitch0 MTU already set to 9000 on"$HostDNS
 }
 #
 
-#Create vMotion vmkernal
+#Create vMotion vmkernel
 if ((Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion -ErrorAction SilentlyContinue) -eq $null) {
 Write-Host "Creating vMotion vmkernel port on"$HostDNS
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch "vSwitch0" -PortGroup vMotion -IP $vMot_IP -SubnetMask $vMot_Mask -Mtu 9000 -VMotionEnabled:$true
 Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion |Set-VirtualPortGroup -VLanId $vMot_VLAN
 Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
+Write-Host 'Enabling Provisioning on vMotion vmkernel'
+$Host1 = Get-VMHost -Name $HostDNS
+$vmkP = Get-VMHost -Name $Host1 |Get-VMHostNetworkAdapter |select VMHost, Name, PortGroupName |where PortGroupName -EQ vMotion
+Write-Host $vmkP
+$vnicMGR = Get-View -Id $Host1.ExtensionData.ConfigManager.VirtualNicManager
+$vnicMGR.selectVnicForNicType('vSphereProvisioning' ,$vmkP.Name)
+
+
 }else {
 Write-Host "vMotion VMK already exist on"$HostDNS
 }
 ###
 
-#Create NFS vmkernal
+#Create NFS vmkernel
 if ((Get-VirtualPortGroup -VMHost $HostDNS -Name NFS -ErrorAction SilentlyContinue) -eq $null) {
 Write-Host "Creating NFS VMK Port on"$HostDNS
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch "vSwitch0" -PortGroup NFS -IP $NFS_IP -SubnetMask $NFS_Mask -Mtu 9000
@@ -77,7 +85,7 @@ Write-Host "A DVS is already configured"
 if (!$Bkup_PortGroup){
 Write-Host "****No backup DVS port group supplied for host"$HostDNS
 }elseif (((Get-VDPortGroup -Name $Bkup_PortGroup | Get-VMHostNetworkAdapter |where {$_.VMHost -like $HostDNS} -ErrorAction SilentlyContinue) -eq $null)) {
-Write-Host "Creating Backup VMKernal Port on"$HostDNS
+Write-Host "Creating Backup VMKernel Port on"$HostDNS
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch $DVS -PortGroup $Bkup_PortGroup -IP $Bkup_IP -SubnetMask $Bkup_Mask
 }else{
 Write-Host "Backup VMK already exist on"$HostDNS
