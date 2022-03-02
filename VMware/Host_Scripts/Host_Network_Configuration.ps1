@@ -1,4 +1,4 @@
-﻿##This script will configure vmkernel port on all host in source file.
+##This script will configure vmkernel port on all host in source file.
 #It will Check and if needed make changes listed bellow
     #1. Set vSwitch0 MTU to 9000
     #2 Create and configure vMotion vmk
@@ -26,19 +26,20 @@ foreach ($Server in $Servers) {
     $NFS_VLAN = $Server.NFS_VLAN
     $Bkup_IP = $Server.Bkup_IP
     $Bkup_Mask = $Server.Bkup_Mask
+    $Bkup_VLAN = $Server.Bkup_VLAN
     $Bkup_PortGroup = $Server.Bkup_PortGroup
     $DVS = $Server.DVS
     $NFS2_IP = $Server.NFS2_IP
     $NFS2_Mask = $Server.NFS2_Mask
     $NFS2_VLAN = $Server.NFS2_VLAN
-   
+$Host1 = Get-VMHost -Name $HostDNS   
 
 Write-Host "----------------------------------------------------------" -ForegroundColor Cyan -BackgroundColor Blue
 Write-Host "Starting the configuration of host"$HostDNS
 
 #Configure vSwtich0 MTU to 9000
 if  ((Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 |where {$_.MTU  -eq 9000}) -eq $null){
-Write-Host "Setting vSwitch MTU equal to 9000 on"$HostDNS
+Write-Host "Setting vSwitch0 MTU equal to 9000 on"$HostDNS
 Get-VirtualSwitch -VMHost $HostDNS -Name vSwitch0 | Set-VirtualSwitch -Mtu 9000 -Confirm:$false
 }else{
 Write-Host "vSwitch0 MTU already set to 9000 on"$HostDNS
@@ -46,20 +47,21 @@ Write-Host "vSwitch0 MTU already set to 9000 on"$HostDNS
 #
 
 #Create vMotion vmkernel
-if ((Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion -ErrorAction SilentlyContinue) -eq $null) {
-Write-Host "Creating vMotion vmkernel port on"$HostDNS
+if (!$vMot_IP) {
+Write-Host "No vMotion IP Address Provided" -ForegroundColor Yellow
+} elseif ((Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion -ErrorAction SilentlyContinue) -eq $null) {
+Write-Host "Creating vMotion vmkernel port on"$HostDNS -ForegroundColor Green
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch "vSwitch0" -PortGroup vMotion -IP $vMot_IP -SubnetMask $vMot_Mask -Mtu 9000 -VMotionEnabled:$true
 Get-VirtualPortGroup -VMHost $HostDNS -Name vMotion |Set-VirtualPortGroup -VLanId $vMot_VLAN
 Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false
 Write-Host 'Enabling Provisioning on vMotion vmkernel'
-$Host1 = Get-VMHost -Name $HostDNS
+#$Host1 = Get-VMHost -Name $HostDNS
 $vmkP = Get-VMHost -Name $Host1 |Get-VMHostNetworkAdapter |select VMHost, Name, PortGroupName |where PortGroupName -EQ vMotion
 Write-Host $vmkP
 $vnicMGR = Get-View -Id $Host1.ExtensionData.ConfigManager.VirtualNicManager
 $vnicMGR.selectVnicForNicType('vSphereProvisioning' ,$vmkP.Name)
 $vnicMGR.selectVnicForNicType('vSphereReplication' ,$vmkP.Name)
 $vnicMGR.selectVnicForNicType('vSphereReplicationNFC' ,$vmkP.Name)
-
 
 }else {
 Write-Host "vMotion VMK already exist on"$HostDNS
@@ -93,7 +95,9 @@ Write-Host "NFS2 VMK already exist on"$HostDNS
 #
 
 #Check and Configure DVS on Host
-if((Get-VMHost $HostDNS | Get-VDSwitch) -eq $null){
+if(!$DVS){
+Write-Host "No DVS Listed for"$HostDNS
+}elseif((Get-VMHost $HostDNS | Get-VDSwitch) -eq $null){
 Write-Host "Adding DVS to Host "$HostDNS
 $vmhostNetworkAdapter1 = $null
 $vmhostNetworkAdapter2 = $null
@@ -106,15 +110,46 @@ Get-VDSwitch $DVS | Add-VDSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $vmhos
 Write-Host "A DVS is already configured"
 }
 
-#Create Backup Portgroup on DVS
-if (!$Bkup_IP){
-Write-Host "No Backup vmk IP address listed in Server.csv for host"$HostDNS
+
+if (!$Bkup_IP) {
+Write-Host "No Backup IP Address for host"$HostDNS
+}else{
+#Create Bkup vmkernel on vSwitch0. Updated 1/10/2021
+if (!$Bkup_VLAN) {
+Write-Host "No vSwitch0 Bkup vmk port listed in Server.csv for host"$HostDNS -ForegroundColor Yellow
+}elseif ((Get-VirtualPortGroup -VMHost $HostDNS -Name Backup -ErrorAction SilentlyContinue) -eq $null) {
+Write-Host "Creating Bkup VMK Port on vSwitch0 for"$HostDNS
+
+New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch vSwitch0 -PortGroup Backup -IP $Bkup_IP -SubnetMask $Bkup_Mask -Mtu 9000 -InformationAction SilentlyContinue
+Get-VirtualPortGroup -VMHost $Host1.Name -Name "Backup" |Set-VirtualPortGroup -VLanId $Bkup_VLAN -InformationAction SilentlyContinue
+}else {
+Write-Host "Backup VMK already exist on"$HostDNS -ForegroundColor DarkBlue -BackgroundColor White
+}
+#
+
+#Create Backup Portgroup on DVS. Updated 1/10/2021
+if (!$Bkup_PortGroup){
+Write-Host "No DVS based Backup vmk port listed in Server.csv for host"$HostDNS -ForegroundColor Yellow
 }elseif (((Get-VDPortGroup -Name $Bkup_PortGroup | Get-VMHostNetworkAdapter |where {$_.VMHost -like $HostDNS} -ErrorAction SilentlyContinue) -eq $null)) {
-Write-Host "Creating Backup VMKernel Port on"$HostDNS
+Write-Host "Creating Backup VMKernel Port on"$HostDNS -ForegroundColor Green
 New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch $DVS -PortGroup $Bkup_PortGroup -IP $Bkup_IP -SubnetMask $Bkup_Mask -InformationAction SilentlyContinue
 }else{
-Write-Host "Backup VMK already exist on"$HostDNS
-}
+Write-Host "Backup VMK already exist on"$HostDNS -ForegroundColor DarkBlue -BackgroundColor White
+}}
+
+
+#######-old updated 1/10/2022
+#Create Backup Portgroup on DVS
+#if (!$Bkup_IP){
+#Write-Host "No Backup vmk IP address listed in Server.csv for host"$HostDNS
+#}elseif (((Get-VDPortGroup -Name $Bkup_PortGroup | Get-VMHostNetworkAdapter |where {$_.VMHost -like $HostDNS} -ErrorAction SilentlyContinue) -eq $null)) {
+#Write-Host "Creating Backup VMKernel Port on"$HostDNS
+#New-VMHostNetworkAdapter -VMHost $HostDNS -VirtualSwitch $DVS -PortGroup $Bkup_PortGroup -IP $Bkup_IP -SubnetMask $Bkup_Mask -InformationAction SilentlyContinue
+#}else{
+#Write-Host "Backup VMK already exist on"$HostDNS
+#}
+#######
+
 
 #Set vMotion - Can be used if vMotion need to be changed. -Depricated
 #Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -VMotionEnabled:$false -Confirm:$false -InformationAction SilentlyContinue
@@ -127,7 +162,7 @@ if ((Get-VMHostNetworkAdapter -vmhost $HostDNS -Name vmk0| where {$_.MTU -eq 900
 Write-Host "Setting MTU of vmk0 on host"$HostDNS "to 9000"
 Get-VMHost $HostDNS |Get-VMHostNetworkAdapter -Name vmk0 |Set-VMHostNetworkAdapter -Mtu 9000 -Confirm:$false -ErrorAction SilentlyContinue
 }else{
-Write-Host "MTU on vmk0 already set to 9000 on host"$HostDNS
+Write-Host "MTU on vmk0 already set to 9000 on host"$HostDNS -ForegroundColor DarkBlue -BackgroundColor White
 }
 
 }
