@@ -1,2 +1,2 @@
-HostDNS,vmk0_IP,vmk0_Mask,vmk0_VLAN,vMot_IP,vMot_Mask,vMot_VLAN,NFS_IP,NFS_Mask,NFS_VLAN,Bkup_IP,Bkup_Mask,Bkup_PortGroup,DVS
-Host.Name.local,10.1.1.20,255.255.255.0,201,10.1.2.20,255.255.255.0,1100,10.1.3.20,255.255.255.0,1400,10.1.4.20,255.255.255.0,PortGroup|onDVS,DVS-Switch
+Manufacture,HostDNS,vmk0_IP,vmk0_Mask,vmk0_VLAN,vMot_IP,vMot_Mask,vMot_VLAN,NFS_IP,NFS_Mask,NFS_VLAN,NFS2_IP,NFS2_Mask,NFS2_VLAN,Bkup_IP,Bkup_Mask,Bkup_VLAN,Bkup_PortGroup,DVS,DVS-Port1,DVS-Port2
+Vmware,dgc-esxi-01,10.0.50.11,255.255.0.0,0,192.168.10.10,255.255.255.0,10,192.168.11.10,255.255.255.0,11,192.168.12.10,255.255.255.0,12,192.168.13.10,255.255.255.0,13,,DGC-DVS-01,vmnic1,vmnic3
