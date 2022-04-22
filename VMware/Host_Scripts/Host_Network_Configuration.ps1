@@ -12,7 +12,7 @@
 
 #vCenter Config - Optional
 $v = Read-Host "Please Provide vCenter Name"
-Connect-VIServer -Server $v -InformationAction SilentlyContinue -WarningAction SilentlyContinue
+Connect-VIServer -Server $v -InformationAction SilentlyContinue -WarningAction SilentlyContinue 
 
 $Servers = Import-Csv ".\Servers.csv"
 
@@ -32,6 +32,9 @@ foreach ($Server in $Servers) {
     $NFS2_IP = $Server.NFS2_IP
     $NFS2_Mask = $Server.NFS2_Mask
     $NFS2_VLAN = $Server.NFS2_VLAN
+    $Port1 = $Server.DVS_Port1
+    $Port2 = $Server.DVS_Port2
+
 $Host1 = Get-VMHost -Name $HostDNS   
 
 Write-Host "----------------------------------------------------------" -ForegroundColor Cyan -BackgroundColor Blue
@@ -102,6 +105,9 @@ Write-Host "Adding DVS to Host "$HostDNS
 $vmhostNetworkAdapter1 = $null
 $vmhostNetworkAdapter2 = $null
 Add-VDSwitchVMHost -VDSwitch $DVS -VMHost $HostDNS
+#---Testing adding vds to Nutanix host
+ #$elag = Get-VDSwitch -VMHost $HostDNS -Name $DVS |Get-VDPort |where {($_.Name -NE $null -and $_.Name -like "*elag*")} |select Name
+#---
 $vmhostNetworkAdapter1 = Get-VMHost $HostDNS | Get-VMHostNetworkAdapter -Physical -Name vmnic2
 Get-VDSwitch $DVS | Add-VDSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $vmhostNetworkAdapter1 -Confirm:$false
 $vmhostNetworkAdapter2 = Get-VMHost $HostDNS | Get-VMHostNetworkAdapter -Physical -Name vmnic3
