@@ -46,11 +46,12 @@ Get-VMHost | Get-VMHostNetworkAdapter |where MTU -eq 1500|select @{N="HostName";
 get-cluster "Cluster Name" |Get-VMHost | Get-VMHostService |where {$_.Key -eq "vpxa"} |Restart-VMHostService -Confirm:$false
 
 //Set SysLogServer Based on Datastore.
-Get-Datacenter -Name SPTC-mgmt-01 |Get-VMHost -PipelineVariable esx |Set-VMHostSysLogServer -SysLogServer 'tcp://172.24.17.222:514' |select @{N='Host Name'; E={$esx.Name}},Host,Port
+Get-Datacenter -Name "DataCenterName" |Get-VMHost -PipelineVariable esx |Set-VMHostSysLogServer -SysLogServer 'tcp://172.16.10.222:514' |select @{N='Host Name'; E={$esx.Name}},Host,Port
 //Get SysLogServer
-Get-Datacenter -Name Skyfall |Get-VMHost -PipelineVariable esx |get-VMHostSysLogServer |select @{N='Host Name'; E={$esx.Name}},Host,Port 
+Get-Datacenter -Name "DataCenterName" |Get-VMHost -PipelineVariable esx |get-VMHostSysLogServer |select @{N='Host Name'; E={$esx.Name}},Host,Port 
  
  //Get MTU for VMKs
- get-cluster -Name "Chinook M5" |Get-VMHost | Get-VMHostNetworkAdapter | Where { $_.GetType().Name -eq "HostVMKernelVirtualNicImpl" } | Select VMHost, Name, MTU, PortGroupName
- 
+ get-cluster -Name "ClusterName" |Get-VMHost | Get-VMHostNetworkAdapter | Where { $_.GetType().Name -eq "HostVMKernelVirtualNicImpl" } | Select VMHost, Name, MTU, PortGroupName
+ //Set MTU for VMK
+ get-cluster -Name "ClusterName" |Get-VMHost | Get-VMHostNetworkAdapter | Where { $_.Portgroupname -eq "Management Network" } | Set-VMHostNetworkAdapter -Mtu 8000 -Confirm:$false
  
