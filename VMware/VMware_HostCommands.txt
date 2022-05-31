@@ -1,0 +1,3 @@
+
+Find host locking file.
+vmfsfilelockinfo -p /vmfs/volumes/67bb4196-0a20786a-3kcd-0025b5a41204e/VM-Name/VM-Name.vmdk' -v vCenter.fqdn.local -u administrator@vsphere.local
