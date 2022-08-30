@@ -55,3 +55,5 @@ Get-Datacenter -Name "DataCenterName" |Get-VMHost -PipelineVariable esx |get-VMH
  //Set MTU for VMK
  get-cluster -Name "ClusterName" |Get-VMHost | Get-VMHostNetworkAdapter | Where { $_.Portgroupname -eq "Management Network" } | Set-VMHostNetworkAdapter -Mtu 8000 -Confirm:$false
  
+//Get Snapshots for all VMs in a cluster
+Get-Cluster "ClusterName" |Get-VM |Get-Snapshot |select VM, Description, Created, SizeGB|Out-GridView
