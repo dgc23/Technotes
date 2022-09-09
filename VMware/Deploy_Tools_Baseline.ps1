@@ -5,7 +5,7 @@ foreach($i in $h) {
    
     if($(Get-Baseline -Id 11 |Get-Compliance -Entity $i).status -like 'NotCompliant'){
 Write-Host "Updating tools on host " $i
-#Get-Baseline -Id 11 |Remediate-Inventory -Entity $i.name -Confirm:$false
+Get-Baseline -Id 11 |Remediate-Inventory -Entity $i.name -Confirm:$false
 }else{
 Write-Host "Tools already up to date on host " $i
 }
