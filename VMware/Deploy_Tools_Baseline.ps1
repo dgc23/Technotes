@@ -1,16 +1,16 @@
-
 $clustername = Read-Host "Please type in name of VMhost Cluster"
 $h = Get-Cluster $clustername |Get-VMHost
 
 foreach($i in $h) {
-    $Baseline_Stat = Get-Baseline -Id 11 |Get-Compliance -Entity $i
-    if($Baseline.status -like NotCompliant){
+   
+    if($(Get-Baseline -Id 11 |Get-Compliance -Entity $i).status -like 'NotCompliant'){
 Write-Host "Updating tools on host " $i
 #Get-Baseline -Id 11 |Remediate-Inventory -Entity $i.name -Confirm:$false
 }else{
 Write-Host "Tools already up to date on host " $i
 }
 }
+
 
 #-----------------------------------------------------------------------------
 ##Junk 1
