@@ -12,8 +12,8 @@ Write-Host "Tools already up to date on host " $i
 }
 }
 
-
-##Junk
+#-----------------------------------------------------------------------------
+##Junk 1
 
 #$j = Read-Host
 #$k = $j
@@ -36,10 +36,10 @@ $B = Get-Compliance -Entity $k -ComplianceStatus NotCompliant
 $B.Baseline
 #Remediate-Inventory -Entity $k -Baseline $B.Baseline -ClusterDisableHighAvailability:$true -ErrorAction SilentlyContinue -Confirm: $false -WhatIf
 #}else{
-
 #Write-Host "host alread done" $k
-
 }
-
-
 #}
+
+Junk 2
+ #$Baseline_Stat = (Get-Baseline -Id 11 |Get-Compliance -Entity $i)
+    #if($Baseline.status -like 'NotCompliant'){
