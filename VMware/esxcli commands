@@ -1,0 +1,7 @@
+# source info 
+# https://docs.delltechnologies.com/bundle/P_STE_PG_CP/page/GUID-159A8E9B-72F3-42C0-BD48-78798BC9F2AF.html
+# https://support.purestorage.com/Solutions/VMware_Platform_Guide/How-To's_for_VMware_Solutions/Virtual_Volume_How_To's/How_To%3A_Adjusting_the_UCS_nfnic_queue_depth_on_ESXi_6.7
+# 
+
+Set queue deptch
+esxcli storage core device set -O 128 -d naa.624a937016d9d3754f8a461800011016
