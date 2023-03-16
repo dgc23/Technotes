@@ -57,3 +57,6 @@ Get-Datacenter -Name "DataCenterName" |Get-VMHost -PipelineVariable esx |get-VMH
  
 //Get Snapshots for all VMs in a cluster
 Get-Cluster "ClusterName" |Get-VM |Get-Snapshot |select VM, Description, Created, SizeGB|Out-GridView
+
+
+Get-Datacenter -Name Datacenter |Get-VMHost -PipelineVariable esx |Set-VMHostSysLogServer -SysLogServer 'tcp://1.2.3.4:514' |select @{N='Host Name'; E={$esx.Name}},Host,Port
