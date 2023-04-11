@@ -1,5 +1,5 @@
 
-Write-Host " Info about the script"
+Write-Host "This script is used to change the queue depth for attached netapp storage devices.  It should be run in two steps.  First step is to update the nfnic queuedepth. after which the hsot will need to be rebooted."
 
 $vmcl = Read-Host "Please input cluster name"
 
@@ -11,9 +11,9 @@ $r2 = @{}
 
 function Show-Menu { 
     Write-Host "================ MENU ================"
-    Write-Host "1: Option 1"
-    Write-Host "2: Option 2"
-    Write-Host "3: Option 3"
+    Write-Host "1: Change the queue depth of cisco nfnic to 256"
+    Write-Host "2: Change the queue depth of each netapp device to 256"
+    Write-Host "3: Display current queue depth setting"
     Write-Host "Q: Quit"
     Write-Host "======================================"
 }
